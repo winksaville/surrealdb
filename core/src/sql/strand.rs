@@ -6,6 +6,9 @@ use std::ops::Deref;
 use std::ops::{self};
 use std::str;
 
+pub const NUL_BYTE: char = '\0';
+pub const NUL_U8: u8 = b'\0';
+
 pub(crate) const TOKEN: &str = "$surrealdb::private::sql::Strand";
 
 /// A string that doesn't contain NUL bytes.
@@ -18,7 +21,7 @@ pub struct Strand(#[serde(with = "no_nul_bytes")] pub String);
 
 impl From<String> for Strand {
 	fn from(s: String) -> Self {
-		if s.contains('\0') {
+		if s.contains(NUL_BYTE) {
 			panic!("contained NUL byte");
 		}
 		Strand(s)
@@ -27,7 +30,7 @@ impl From<String> for Strand {
 
 impl From<&str> for Strand {
 	fn from(s: &str) -> Self {
-		if s.contains('\0') {
+		if s.contains(NUL_BYTE) {
 			panic!("contained NUL byte");
 		}
 		Self::from(String::from(s))
@@ -84,11 +87,13 @@ pub(crate) mod no_nul_bytes {
 	};
 	use std::fmt;
 
+	use crate::sql::NUL_BYTE;
+
 	pub(crate) fn serialize<S>(s: &str, serializer: S) -> Result<S::Ok, S::Error>
 	where
 		S: Serializer,
 	{
-		if s.contains('\0') {
+		if s.contains(NUL_BYTE) {
 			return Err(serde::ser::Error::custom("contained NUL byte"));
 		}
 		serializer.serialize_str(s)
@@ -111,7 +116,7 @@ pub(crate) mod no_nul_bytes {
 			where
 				E: de::Error,
 			{
-				if value.contains('\0') {
+				if value.contains(NUL_BYTE) {
 					Err(de::Error::custom("contained NUL byte"))
 				} else {
 					Ok(value.to_owned())
@@ -122,7 +127,7 @@ pub(crate) mod no_nul_bytes {
 			where
 				E: de::Error,
 			{
-				if value.contains('\0') {
+				if value.contains(NUL_BYTE) {
 					Err(de::Error::custom("contained NUL byte"))
 				} else {
 					Ok(value)

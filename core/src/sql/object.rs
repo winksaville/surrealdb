@@ -278,7 +278,7 @@ mod no_nul_bytes_in_keys {
 	};
 	use std::{collections::BTreeMap, fmt};
 
-	use crate::sql::Value;
+	use crate::sql::{Value, NUL_BYTE};
 
 	pub(crate) fn serialize<S>(
 		m: &BTreeMap<String, Value>,
@@ -289,7 +289,7 @@ mod no_nul_bytes_in_keys {
 	{
 		let mut s = serializer.serialize_map(Some(m.len()))?;
 		for (k, v) in m {
-			if k.contains('\0') {
+			if k.contains(NUL_BYTE) {
 				return Err(serde::ser::Error::custom("contained NUL byte"));
 			}
 			s.serialize_entry(k, v)?;

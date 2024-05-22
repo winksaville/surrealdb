@@ -152,6 +152,8 @@ pub use self::value::Values;
 pub use self::version::Version;
 pub use self::view::View;
 pub use self::with::With;
+pub use self::strand::NUL_BYTE;
+pub use self::strand::NUL_U8;
 
 // module reexporting parsing function to prevent a breaking change.
 #[doc(hidden)]

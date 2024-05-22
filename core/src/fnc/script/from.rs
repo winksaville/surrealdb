@@ -4,6 +4,7 @@ use crate::sql::datetime::Datetime;
 use crate::sql::object::Object;
 use crate::sql::value::Value;
 use crate::sql::Id;
+use crate::sql::NUL_BYTE;
 use chrono::{TimeZone, Utc};
 use js::prelude::This;
 use js::Coerced;
@@ -15,7 +16,7 @@ use js::FromJs;
 use rust_decimal::Decimal;
 
 fn check_nul(s: &str) -> Result<(), Error> {
-	if s.contains('\0') {
+	if s.contains(NUL_BYTE) {
 		Err(Error::InvalidString(std::ffi::CString::new(s).unwrap_err()))
 	} else {
 		Ok(())

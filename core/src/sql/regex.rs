@@ -12,6 +12,8 @@ use std::hash::{Hash, Hasher};
 use std::str::FromStr;
 use std::{env, str};
 
+use super::NUL_BYTE;
+
 pub(crate) const TOKEN: &str = "$surrealdb::private::sql::Regex";
 
 #[revisioned(revision = 1)]
@@ -51,7 +53,7 @@ impl FromStr for Regex {
 	type Err = <regex::Regex as FromStr>::Err;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		if s.contains('\0') {
+		if s.contains(NUL_BYTE) {
 			Err(regex::Error::Syntax("regex contained NUL byte".to_owned()))
 		} else {
 			regex_new(&s.replace("\\/", "/")).map(Self)

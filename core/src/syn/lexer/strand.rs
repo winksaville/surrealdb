@@ -2,7 +2,7 @@
 
 use std::mem;
 
-use crate::syn::token::{Token, TokenKind};
+use crate::{sql::{NUL_BYTE, NUL_U8}, syn::token::{Token, TokenKind}};
 
 use super::{unicode::chars, Error, Lexer};
 
@@ -36,9 +36,9 @@ impl<'a> Lexer<'a> {
 						self.string = Some(mem::take(&mut self.scratch));
 						return Ok(self.finish_token(TokenKind::Strand));
 					}
-					b'\0' => {
+					NUL_U8 => {
 						// null bytes not allowed
-						return Err(Error::UnexpectedCharacter('\0'));
+						return Err(Error::UnexpectedCharacter(NUL_BYTE));
 					}
 					b'\\' => {
 						// Handle escape sequences.
