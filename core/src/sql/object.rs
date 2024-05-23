@@ -289,7 +289,9 @@ mod no_nul_bytes_in_keys {
 	{
 		let mut s = serializer.serialize_map(Some(m.len()))?;
 		for (k, v) in m {
-			debug_assert!(!k.contains('\0'));
+			if k.contains('\0') {
+				return Err(serde::ser::Error::custom("contained NUL byte"));
+			}
 			s.serialize_entry(k, v)?;
 		}
 		s.end()

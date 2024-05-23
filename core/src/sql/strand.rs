@@ -18,14 +18,18 @@ pub struct Strand(#[serde(with = "no_nul_bytes")] pub String);
 
 impl From<String> for Strand {
 	fn from(s: String) -> Self {
-		debug_assert!(!s.contains('\0'));
+		if s.contains('\0') {
+			panic!("contained NUL byte");
+		}
 		Strand(s)
 	}
 }
 
 impl From<&str> for Strand {
 	fn from(s: &str) -> Self {
-		debug_assert!(!s.contains('\0'));
+		if s.contains('\0') {
+			panic!("contained NUL byte");
+		}
 		Self::from(String::from(s))
 	}
 }
@@ -84,7 +88,9 @@ pub(crate) mod no_nul_bytes {
 	where
 		S: Serializer,
 	{
-		debug_assert!(!s.contains('\0'));
+		if s.contains('\0') {
+			return Err(serde::ser::Error::custom("contained NUL byte"));
+		}
 		serializer.serialize_str(s)
 	}
 
